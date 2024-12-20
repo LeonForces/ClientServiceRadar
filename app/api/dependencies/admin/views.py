@@ -1,6 +1,6 @@
 from sqladmin import ModelView
 
-from app.models.cars import Cars
+from app.models.reviews import Reviews
 from app.models.users import Users
 
 
@@ -16,13 +16,13 @@ class UserAdmin(ModelView, model=Users):
     icon = "fa-solid fa-user"
 
 
-class CarAdmin(ModelView, model=Cars):
+class ReviewAdmin(ModelView, model=Reviews):
     column_list = []
     can_delete = True
     can_create = False
     can_edit = False
 
-    name = "Car"
-    name_plural = "Cars"
-    icon = "fa-solid fa-car"
+    name = "Review"
+    name_plural = "Reviews"
+    icon = "fa-solid fa-review"
 

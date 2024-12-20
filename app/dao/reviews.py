@@ -1,19 +1,19 @@
 from sqlalchemy import select
 
 from app.dao.base import BaseDAO
-from app.models.cars import Cars
+from app.models.reviews import Reviews
 from app.core.db import async_session_maker
 
 
-class CarsDAO(BaseDAO):
+class ReviewsDAO(BaseDAO):
 
-    model = Cars
+    model = Reviews
 
     @classmethod
-    async def find_by_number(cls, license_plate: str):
+    async def find_by_header(cls, header: str):
 
         async with async_session_maker() as session:
 
-            query = select(Cars).filter_by(license_plate=license_plate)
+            query = select(Reviews).filter_by(header=header)
             result = await session.execute(query)
             return result.one_or_none()

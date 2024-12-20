@@ -2,6 +2,8 @@ from sqlalchemy import insert, select, delete, update, Result
 
 from app.core.db import async_session_maker
 
+from sqlalchemy import desc
+
 
 class BaseDAO:
 
@@ -60,5 +62,18 @@ class BaseDAO:
         async with async_session_maker() as session:
 
             query = select(cls.model.__table__.columns).filter(*filters)
+            result = await session.execute(query)
+            return result.mappings().all()
+
+    @classmethod
+    async def find_last_some(cls, *filters):
+        async with async_session_maker() as session:
+            query = (
+                select(cls.model.__table__.columns)
+                .filter(*filters)
+                .order_by(desc(cls.model.id))
+                .limit(10)
+            )
+
             result = await session.execute(query)
             return result.mappings().all()

@@ -13,18 +13,18 @@ from redis import asyncio as aioredis
 
 from app.core.db import delete_tables, create_tables, engine
 from app.api.endpoints.users import router as user_router
-from app.api.endpoints.cars import router as car_router
+from app.api.endpoints.reviews import router as review_router
 from app.api.endpoints.prometheus import router as prometheus_router
 from app.core.config import settings
 from app.api.dependencies.admin.auth import authentication_backend
-from app.api.dependencies.admin.views import UserAdmin, CarAdmin
+from app.api.dependencies.admin.views import UserAdmin, ReviewAdmin
 from app.core.logging import setup
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 
-    await delete_tables()
-    await create_tables()
+    # await delete_tables()
+    # await create_tables()
     redis = aioredis.from_url(settings.redis_url, encoding="utf8", decode_responses=True)
     FastAPICache.init(RedisBackend(redis), prefix="cache")
 
@@ -33,7 +33,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(user_router)
-app.include_router(car_router)
+app.include_router(review_router)
 app.include_router(prometheus_router)
 
 
@@ -61,12 +61,5 @@ instrumentator.instrument(app).expose(app)
 
 admin = Admin(app, engine, authentication_backend=authentication_backend)
 
-"""admin.add_view(AccidentAdmin)
-admin.add_view(TripAdmin)
-admin.add_view(CarAdmin)
-admin.add_view(DriverAdmin)
-
-admin.add_view(RepairAdmin)
-admin.add_view(UserAdmin)"""
 
 
