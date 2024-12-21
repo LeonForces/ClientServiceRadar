@@ -12,6 +12,8 @@ from app.models.users import Users
 from app.api.dependencies.users.dependencies import get_current_user
 from datetime import date
 
+from app.llm import analyze_feedback
+
 
 router = APIRouter(prefix="/reviews", tags=["Reviews"])
 
@@ -29,7 +31,14 @@ async def add_review(header: Annotated[str, Query(description="Заголово�
 @cache(expire=15)
 async def get_reviews(user: Users = Depends(get_current_user)):
     reviews = await ReviewsDAO.find_last_some()
-    reviews_json = parse_obj_as(list[SReview], reviews)
+
+    list = []
+    for review in reviews:
+        rev = analyze_feedback(f'{review.header}\n{review.rating}\n{review.description}')
+        SReview()
+
+
+    reviews_json = parse_obj_as(list[SReview], list)
     return reviews_json
 
 
@@ -39,7 +48,7 @@ async def get_reviews(user: Users = Depends(get_current_user)):
 #     return "Success"
 #
 #
-# @router.put("/{id}", description="Изменение автомобиля")
+# @router.put("/{id}", description="Изменение")
 # async def update(id: int, user: Users = Depends(get_current_user)):
 #
 #     return "Success"

@@ -98,7 +98,6 @@ def check_for_new_reviews():
             print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}: Есть новые отзывы! {review_time}')
             last_review_time = review_time
 
-            broadcast_message(update, context)
         else:
             print(f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}: Нет новых отзывов. Последний отзыв был {last_review_time}')
     else:
@@ -111,7 +110,7 @@ def main() -> None:
     # Обработчики команд
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("send_all", broadcast_message))
-    application.run_polling()
+
 
     # Планировщик задач
     schedule.every(1).minutes.do(check_for_new_reviews)
@@ -121,6 +120,8 @@ def main() -> None:
     while True:
         schedule.run_pending()
         time.sleep(1)
+
+    application.run_polling()
 
 
 if __name__ == "__main__":

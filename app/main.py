@@ -71,7 +71,7 @@ instrumentator.instrument(app).expose(app)
 admin = Admin(app, engine, authentication_backend=authentication_backend)
 
 
-BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"
+BOT_TOKEN = "8113939811:AAEPFYjLUd0vt4uJx2ytm1LBPrngpBj6N00"
 
 # URL страницы с отзывами
 URL = 'https://www.banki.ru/services/responses/bank/promsvyazbank/?type=all'
