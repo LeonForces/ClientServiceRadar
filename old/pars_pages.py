@@ -27,7 +27,7 @@ else:
 
 
 
-with open("parsed_data.csv", mode='w', newline='', encoding='utf-8') as file:
+with open("../parsed_data.csv", mode='w', newline='', encoding='utf-8') as file:
     writer = csv.writer(file)
     writer.writerow(['Rate', 'Header', 'Description'])
 

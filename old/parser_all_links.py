@@ -39,6 +39,6 @@ for i in range(200):
         print(i)
     time.sleep(3)
 
-with open("links.txt", 'w', encoding='utf-8') as file:
+with open("../links.txt", 'w', encoding='utf-8') as file:
     for link in links:
         file.write(link + '\n')
