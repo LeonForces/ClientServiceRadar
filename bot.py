@@ -111,6 +111,7 @@ def main() -> None:
     # Обработчики команд
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("send_all", broadcast_message))
+    application.run_polling()
 
     # Планировщик задач
     schedule.every(1).minutes.do(check_for_new_reviews)
@@ -121,7 +122,6 @@ def main() -> None:
         schedule.run_pending()
         time.sleep(1)
 
-    application.run_polling()
 
 if __name__ == "__main__":
     main()
