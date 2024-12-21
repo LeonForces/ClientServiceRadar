@@ -10,7 +10,7 @@ from app.schemas.reviews import SReview
 from app.dao.reviews import ReviewsDAO
 from app.models.users import Users
 from app.api.dependencies.users.dependencies import get_current_user
-from datetime import date
+from datetime import date, datetime
 
 from app.llm import analyze_feedback
 
@@ -27,7 +27,7 @@ async def add_review(header: Annotated[str, Query(description="Заголово�
     review = analyze_feedback(f'{header}\n{rating}\n{description}')
     await ReviewsDAO.add(header=header, description=description, rating=rating, date=date.today().strftime("%Y-%m-%d"),
                          category=review['Категория'],
-                         subcategory=review['Подкатегория'], reason=review['Причина обращения'])
+                         subcategory=review['Подкатегория'], reason=review['Причина обращения'], review_date=datetime.now())
     return "Success"
 
 

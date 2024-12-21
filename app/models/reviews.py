@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, DateTime
 
 from app.core.db import Base
 
-from datetime import date
+from datetime import datetime
 
 
 class Reviews(Base):
@@ -17,9 +17,8 @@ class Reviews(Base):
     subcategory: Mapped[str] = mapped_column(nullable=False)
     reason: Mapped[str] = mapped_column(nullable=False)
     date: Mapped[str] = mapped_column(nullable=False)
-    review_date: Mapped[date] = mapped_column(nullable=False)
+    review_date: Mapped[datetime] = mapped_column(nullable=False)
 
 
     def __str__(self):
-
-        return f"{self.header} | {self.description}"
+        pass
