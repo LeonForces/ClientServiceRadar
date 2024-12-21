@@ -1,5 +1,8 @@
 from contextlib import asynccontextmanager
 
+from telegram import Update
+from telegram.ext import Application, CommandHandler, ContextTypes
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -70,118 +73,4 @@ instrumentator.instrument(app).expose(app)
 
 admin = Admin(app, engine, authentication_backend=authentication_backend)
 
-
-BOT_TOKEN = "8113939811:AAEPFYjLUd0vt4uJx2ytm1LBPrngpBj6N00"
-
-# URL страницы с отзывами
-URL = 'https://www.banki.ru/services/responses/bank/promsvyazbank/?type=all'
-
-# Список для хранения ID пользователей
-user_ids = set()
-
-# Переменная для хранения времени последнего отзыва
-last_review_time = None
-
-# Инициализируем приложение Telegram Bot
-application = ApplicationBuilder().token(BOT_TOKEN).build()
-
-# Обработчик команды /start
-async def start(update: Update, context: CallbackContext):
-    user_id = update.effective_user.id
-    user_ids.add(user_id)
-    print(f"Пользователь добавлен: {user_id}")
-    await update.message.reply_text("Вы подписаны на уведомления о новых отзывах.")
-
-# Отправка уведомлений всем пользователям
-async def send_notifications(context: CallbackContext):
-    if user_ids:
-        for user_id in user_ids:
-            try:
-                await context.bot.send_message(chat_id=user_id, text="Есть новый отзыв!")
-            except Exception as e:
-                print(f"Ошибка при отправке сообщения пользователю {user_id}: {e}")
-    else:
-        print("Нет подписчиков для отправки уведомлений.")
-
-# Проверяет наличие новых отзывов
-def check_for_new_reviews():
-    global last_review_time
-
-    # Делаем запрос к URL
-    response = requests.get(URL)
-
-    # Парсим HTML с помощью BeautifulSoup
-    soup = BeautifulSoup(response.text, 'html.parser')
-
-    # Находим последний элемент с отзывом (предполагается, что последний отзыв находится последним в списке)
-    review_time_element = soup.find('span', class_='l0caf3d5f')  # предположительный селектор
-    if review_time_element:
-        review_time_str = review_time_element.text.strip()
-
-        try:
-            # Преобразуем строку в объект datetime
-            current_review_time = datetime.strptime(review_time_str, '%d.%m.%Y %H:%M')
-
-            if last_review_time is None or current_review_time > last_review_time:
-                last_review_time = current_review_time
-                print(f"{current_review_time.strftime('%Y-%m-%d %H:%M:%S')}: Есть новый отзыв!")
-                application.job_queue.run_once(send_notifications, 0)
-            else:
-                print(f"{current_review_time.strftime('%Y-%m-%d %H:%M:%S')}: Нет новых отзывов. Последний отзыв был {last_review_time}")
-        except ValueError as e:
-            print(f"Ошибка при преобразовании строки даты: {e}")
-    else:
-        print("Не удалось найти элемент с последним отзывом.")
-
-# Инициализация времени последнего отзыва при первом запуске
-def initialize_last_review_time():
-    global last_review_time
-
-    # Делаем GET-запрос к URL
-    response = requests.get(URL)
-
-    # Парсим HTML с помощью BeautifulSoup
-    soup = BeautifulSoup(response.text, 'html.parser')
-
-    # Находим последний элемент с отзывом (предполагается, что последний отзыв находится последним в списке)
-    review_time_element = soup.find('span', class_='l0caf3d5f')  # предположительный селектор
-    if review_time_element:
-        review_time_str = review_time_element.text.strip()
-
-        try:
-            # Преобразуем строку в объект datetime
-            last_review_time = datetime.strptime(review_time_str, '%d.%m.%Y %H:%M')
-            print(f'Последнее время отзыва установлено: {last_review_time.strftime("%Y-%m-%d %H:%M:%S")}')
-        except ValueError as e:
-            print(f'Ошибка при преобразовании строки даты: {e}')
-            return None
-    else:
-        print("Не удалось найти элемент с последним отзывом.")
-        return None
-
-# Маршрут для обработки входящих запросов от Telegram
-@app.post("/webhook")
-async def webhook(request: Request):
-    data = await request.json()
-    update = Update.de_json(data, bot=application.bot)
-    application.dispatcher.process_update(update)
-    return JSONResponse({"ok": True})
-
-# Добавляем обработчик команды /start
-application.add_handler(CommandHandler("start", start))
-
-# Инициализируем последнее время отзыва
-initialize_last_review_time()
-
-# Запускаем проверку каждые 60 секунд
-schedule.every(60).seconds.do(check_for_new_reviews)
-
-# Запускаем планировщик задач в отдельном потоке
-def run_scheduler():
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-scheduler_thread = threading.Thread(target=run_scheduler)
-scheduler_thread.start()
 

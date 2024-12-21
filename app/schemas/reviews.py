@@ -2,6 +2,8 @@ from pydantic import BaseModel, field_validator
 import re
 from typing import Optional
 
+from datetime import date
+
 
 
 class SReviewBase(BaseModel):
@@ -13,6 +15,7 @@ class SReviewBase(BaseModel):
     subcategory: Optional[str] = None
     reason: Optional[str] = None
     date: str
+    review_date: Optional[date] = None
 
 
 
@@ -26,4 +29,4 @@ class SReview(SReviewBase):
 
 
     class Config:
-        orm_mode = True
+        from_attributes = True

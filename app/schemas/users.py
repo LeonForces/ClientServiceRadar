@@ -46,4 +46,4 @@ class SUser(SUserBase):
     trips: Optional[List[STrip]] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True

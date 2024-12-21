@@ -23,7 +23,11 @@ async def add_review(header: Annotated[str, Query(description="Заголово�
                      description: Annotated[str, Query(description="Описание")],
                      rating: Annotated[str, Query(description="Оценка")],
                      user: Users = Depends(get_current_user)):
-    await ReviewsDAO.add(header=header, description=description, rating=rating, date=date.today().strftime("%Y-%m-%d"))
+
+    review = analyze_feedback(f'{header}\n{rating}\n{description}')
+    await ReviewsDAO.add(header=header, description=description, rating=rating, date=date.today().strftime("%Y-%m-%d"),
+                         category=review['Категория'],
+                         subcategory=review['Подкатегория'], reason=review['Причина обращения'])
     return "Success"
 
 
@@ -31,14 +35,7 @@ async def add_review(header: Annotated[str, Query(description="Заголово�
 @cache(expire=15)
 async def get_reviews(user: Users = Depends(get_current_user)):
     reviews = await ReviewsDAO.find_last_some()
-
-    list = []
-    for review in reviews:
-        rev = analyze_feedback(f'{review.header}\n{review.rating}\n{review.description}')
-        SReview()
-
-
-    reviews_json = parse_obj_as(list[SReview], list)
+    reviews_json = parse_obj_as(list[SReview], reviews)
     return reviews_json
 
 

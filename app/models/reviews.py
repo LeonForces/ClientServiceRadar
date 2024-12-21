@@ -3,6 +3,8 @@ from sqlalchemy import ForeignKey
 
 from app.core.db import Base
 
+from datetime import date
+
 
 class Reviews(Base):
     __tablename__ = "reviews"
@@ -15,8 +17,9 @@ class Reviews(Base):
     subcategory: Mapped[str] = mapped_column(nullable=False)
     reason: Mapped[str] = mapped_column(nullable=False)
     date: Mapped[str] = mapped_column(nullable=False)
+    review_date: Mapped[date] = mapped_column(nullable=False)
 
 
     def __str__(self):
 
-        return f"{self.bramd} | {self.model}"
+        return f"{self.header} | {self.description}"
